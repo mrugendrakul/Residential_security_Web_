@@ -13,7 +13,7 @@ st.set_page_config(
     page_title="Register user"
 )
 
-csv_file = "PythonFiles\dataset.csv"
+csv_file = "PythonFiles/dataset.csv"
 
 id = count_users(csv_file = csv_file)-1
 

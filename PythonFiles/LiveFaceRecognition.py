@@ -111,10 +111,10 @@ model.load_weights('PythonFiles/vgg_face_weights.h5')
 
 model = Model(inputs=model.layers[0].input, outputs=model.layers[-2].output)
 
-scaler = load('PythonFiles/scaler_updated.joblib')
-pca = load('PythonFiles/pca_model_updated.joblib')
+scaler = load('PythonFiles/scaler.joblib')
+pca = load('PythonFiles/pca_model.joblib')
 #Change this to load different classifier
-clf = load('PythonFiles/SVC_updated.joblib')
+clf = load('PythonFiles/SVC.joblib')
 
 def preprocess_image(img):
     img = img_to_array(img)
@@ -132,9 +132,10 @@ def Face_Recognition(roi,model,scaler,pca,clf):
     result1 = clf.predict(embedding_vector_pca)[0]
     #print(result1)
     y_predict = clf.predict_proba(embedding_vector_pca)[0]
-    #print(y_predict)
+    print(y_predict)
     
-    result = np.where(y_predict > 0.999999)[0]
+    threshold = 0.99999985
+    result = np.where(y_predict > threshold)[0]
     
     return result , y_predict
 
@@ -144,7 +145,7 @@ mtcnn = MTCNN(image_size=160, margin=14, min_face_size=20, device='cpu', post_pr
 
 
 
-csv_file = "PythonFiles\dataset.csv"
+csv_file = "PythonFiles/dataset.csv"
 users = classes(csv_file=csv_file)
 
 for user,id in users.items():
@@ -180,7 +181,7 @@ def LiveFaceRecognition(
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1200)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1600)
 
-    cap1 = cv2.VideoCapture(1)
+    # cap1 = cv2.VideoCapture(1)
 
     # Check if the camera is opened successfully
     if not cap.isOpened():
@@ -189,11 +190,11 @@ def LiveFaceRecognition(
         cap.release()
         return 
     
-    if not cap1.isOpened():
-        print("Error: Could not open camera.")
-        st.error("Secondary Camera not open")
-        cap1.release()
-        return 
+    # if not cap1.isOpened():
+    #     print("Error: Could not open camera.")
+    #     st.error("Secondary Camera not open")
+    #     cap1.release()
+    #     return 
 
     # Define folder to save unknown faces
     unknown_folder = 'unknown_faces'
@@ -228,7 +229,7 @@ def LiveFaceRecognition(
             frame_face = cv2.resize(frame_face, (320, 320), interpolation=cv2.INTER_CUBIC)
             boxes, probs = mtcnn.detect(frame_face, landmarks=False)
 
-            if boxes is not None:
+            if not probs.all() == None and probs.all() > 0.98:
                 for x1, y1, x2, y2 in boxes:
                     x1, x2, y1, y2 = int(x1 * 1600 / 640), int(x2 * 1600 / 640), int(y1 * 1200 / 640), int(y2 * 1200 / 640)
                     roi = frame[y1:y2, x1:x2]

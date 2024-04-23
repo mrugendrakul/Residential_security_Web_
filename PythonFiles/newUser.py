@@ -111,11 +111,11 @@ def TrainNewUsers():
     new_user_embedding_vector = model.predict(Train_Data, steps=len(Train_Data), verbose=1)
     
     
-    old_embedding_vector = np.load('PythonFiles\embedding_vector_updated.npy')
-    y_train = np.load('PythonFiles\embedding_labels_updated.npy')
+    old_embedding_vector = np.load('PythonFiles/embedding_vector_updated.npy')
+    y_train = np.load('PythonFiles/embedding_labels_updated.npy')
 
     newUser_path = 'PythonFiles/newUser'
-    Dataset_path = "PythonFiles\dataset.csv"
+    Dataset_path = "PythonFiles/dataset.csv"
 
     new_user_labels = count_folders(newUser_path)  
     dataset_size = count_users(Dataset_path)-1
