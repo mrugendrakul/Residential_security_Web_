@@ -8,14 +8,19 @@ from contextlib import contextmanager
 from PythonFiles.initFirebase import generate_random_id
 from PythonFiles.newUser import count_users
 import shutil
+import csv
 
 st.set_page_config(
     page_title="Register user"
 )
 
-csv_file = "PythonFiles/dataset.csv"
+Dataset_path = "PythonFiles/dataset.csv"
+def addUser(csv_file,data):
+    with open(csv_file, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(data)
 
-id = count_users(csv_file = csv_file)-1
+id = count_users(csv_file = Dataset_path)-1
 
 @contextmanager
 def acquire_camera():
@@ -33,7 +38,8 @@ def register():
 
     with placeForm.form("userRegistration"):
         label_text = st.text_input(label="Name*",placeholder="your name",max_chars=18,)
-        information = st.text_input(label="Information*",placeholder="address")   
+        information = st.text_input(label="QTR No.*",placeholder="address")
+        contact = st.text_input(label = "Contact No.*",placeholder = "XXX-XXX-XXXX")
         # Capture image from camera
         
         # profile_photo = st.camera_input("Please Capture profile photo:")
@@ -76,12 +82,16 @@ def register():
                             image_path=f'profile_photos/{id}.jpg',
                             name = label_text,
                             id = f"{id}",
-                            information=information
+                            information=information,
+                            contact_no=contact
                         )
+                        data = (label_text,id)
+                        addUser(csv_file = Dataset_path,data = data)
                         print("image is uploaded")
                         SendNotification(given_title="new registration", given_content=f"{label_text} has registered on the system")
                         with placeholder.container():
-                            container.success("successfully send data to backend ?")
+                            container.success("successfully send data to backend !")
+                            container.success("Now you can train data or add new user")
                 except Exception as e :
                     with placeholder.container():
                         container.error(f"unable to send data to backend : {e}")

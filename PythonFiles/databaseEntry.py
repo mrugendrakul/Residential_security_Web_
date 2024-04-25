@@ -12,7 +12,8 @@ def apiUpload(
         information,
         image_path,
         id,
-        name
+        name,
+        contact_no
         ):
 
     # Destination path in Firebase Storage
@@ -34,7 +35,8 @@ def apiUpload(
         "id" : id,
         "info" : get_information(information),
         "name" : name,
-        "profilePhoto" : download_url
+        "profilePhoto" : download_url,
+        "contactNumber" : contact_no
     }
 
     try:

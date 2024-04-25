@@ -17,6 +17,7 @@ import os
 import csv
 import shutil
 import streamlit as st
+from PythonFiles.databaseEntry import apiUpload
 
 def vgg_face():
     model = Sequential()
@@ -98,11 +99,11 @@ def count_images_per_class(directory):
 def TrainNewUsers():
     train_dir='PythonFiles/newUser'
     Train_Data=tf.keras.preprocessing.image.ImageDataGenerator(
-        horizontal_flip=True,
-        zoom_range = {0.5,1},
-        rotation_range = 45,
-        fill_mode = 'nearest',
-        rescale=1/255.0
+        # horizontal_flip=True,
+        # zoom_range = [0.5,1],
+        # rotation_range = 45,
+        # fill_mode = 'nearest',
+        # rescale=1/255.0
     ).flow_from_directory(train_dir,batch_size=16,subset="training",target_size=(224,224),shuffle=False)
 
 
@@ -156,10 +157,17 @@ def TrainNewUsers():
     dump(clf, 'PythonFiles/SVC_updated.joblib') 
 
     newUserData = list(Train_Data.class_indices.keys())
+    information_path = 'PythonFiles/information_set.csv'
     counter = dataset_size
     for person in newUserData:
-        data = (person,counter)
-        addUser(csv_file = Dataset_path,data = data)
+        # data = (person,counter)
+        # addUser(csv_file = Dataset_path,data = data)
+        # apiUpload(
+        #         image_path=f'profile_photos/{counter}.jpg',
+        #         name = person,
+        #         id = f"{counter}",
+        #         information=information
+        #     )
         counter = counter +1
         shutil.rmtree(f"PythonFiles/newUser/{person}")
 

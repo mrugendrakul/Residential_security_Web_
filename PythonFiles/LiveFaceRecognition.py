@@ -134,7 +134,7 @@ def Face_Recognition(roi,model,scaler,pca,clf):
     y_predict = clf.predict_proba(embedding_vector_pca)[0]
     print(y_predict)
     
-    threshold = 0.99999985
+    threshold = 0.6
     result = np.where(y_predict > threshold)[0]
     
     return result , y_predict
@@ -142,7 +142,6 @@ def Face_Recognition(roi,model,scaler,pca,clf):
 
 # Face Detection
 mtcnn = MTCNN(image_size=160, margin=14, min_face_size=20, device='cpu', post_process=False)
-
 
 
 csv_file = "PythonFiles/dataset.csv"
@@ -259,7 +258,7 @@ def LiveFaceRecognition(
                                     print(f"Unable to process for delivery persons : {e} ")
                                 print("Saving the image of the first unknown face.")
                                 # Save the image of the unknown face
-                                unknown_img_path = os.path.join(unknown_folder, f'unknown_{datetime.now().strftime("%Y%m%d%H%M%S")}.png')
+                                unknown_img_path = os.path.join(unknown_folder, f'unknown_{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}.png')
                                 roi = cv2.resize(roi, (100, 100))
                                 cv2.imwrite(unknown_img_path, cv2.cvtColor(roi, cv2.COLOR_BGR2RGB))
                                 try:

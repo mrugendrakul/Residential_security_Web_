@@ -2,7 +2,15 @@ import cv2
 from mtcnn import MTCNN
 import streamlit as st
 import os
+import csv
 import shutil
+
+
+def addUser(csv_file,data):
+    with open(csv_file, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(data)
+        # file.write("\n")
 
 def generateUser(label,placeholder):
     # Create a folder to save the detected faces
@@ -40,16 +48,17 @@ def generateUser(label,placeholder):
 
             # Save the face in the output folder
             face_filename = os.path.join(output_folder, f"face_{frame_counter}_{i}.jpg")
-            try:
-                if(i==0):
-                    cv2.imwrite(face_filename, face)
-                else:
-                    placeholder.error("More than one person detected restart the registration")
-                    shutil.rmtree(f"PythonFiles/newUser/{label}")
-                    raise ValueError("Restart the process")
-            except Exception as e:
-                placeholder.error(f"Error {e}")
-                raise ValueError("Restart the process")
+            cv2.imwrite(face_filename, face)
+            # try:
+            #     # if(i==0):
+            #     #     cv2.imwrite(face_filename, face)
+            #     # else:
+            #     #     placeholder.error("More than one person detected restart the registration")
+            #     #     shutil.rmtree(f"PythonFiles/newUser/{label}")
+            #     #     raise ValueError("Restart the process")
+            # except Exception as e:
+            #     placeholder.error(f"Error {e}")
+            #     raise ValueError("Restart the process")
             
             # Draw a rectangle around the detected face on the original frame
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
