@@ -134,7 +134,7 @@ def Face_Recognition(roi,model,scaler,pca,clf):
     y_predict = clf.predict_proba(embedding_vector_pca)[0]
     print(y_predict)
     
-    threshold = 0.6
+    threshold = 0.8
     result = np.where(y_predict > threshold)[0]
     
     return result , y_predict
