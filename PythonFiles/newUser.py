@@ -18,6 +18,7 @@ import csv
 import shutil
 import streamlit as st
 from PythonFiles.databaseEntry import apiUpload
+from PythonFiles.dataAugmentation import augment_dataset
 
 def vgg_face():
     model = Sequential()
@@ -98,12 +99,17 @@ def count_images_per_class(directory):
 
 def TrainNewUsers():
     train_dir='PythonFiles/newUser'
+
+    print("augmentation started")
+    augment_dataset(train_dir,train_dir,4)
+    print("augmentation done")
+
     Train_Data=tf.keras.preprocessing.image.ImageDataGenerator(
-        # horizontal_flip=True,
+        horizontal_flip=True,
         # zoom_range = [0.5,1],
         # rotation_range = 45,
         # fill_mode = 'nearest',
-        # rescale=1/255.0
+        rescale=1/255.0
     ).flow_from_directory(train_dir,batch_size=16,subset="training",target_size=(224,224),shuffle=False)
 
 
@@ -112,25 +118,27 @@ def TrainNewUsers():
     new_user_embedding_vector = model.predict(Train_Data, steps=len(Train_Data), verbose=1)
     
     
-    old_embedding_vector = np.load('PythonFiles/embedding_vector_updated.npy')
-    y_train = np.load('PythonFiles/embedding_labels_updated.npy')
+    old_embedding_vector = np.load('PythonFiles/Xdata.npy')
+    y_train = np.load('PythonFiles/ydata.npy')
 
+    print(old_embedding_vector.size)
     newUser_path = 'PythonFiles/newUser'
     Dataset_path = "PythonFiles/dataset.csv"
 
     new_user_labels = count_folders(newUser_path)  
     dataset_size = count_users(Dataset_path)-1
     
+    # dataset_size = dataset_size - new_user_labels
 
     num_images_per_class_new = count_images_per_class(newUser_path)
 
-    labels_old = np.load('PythonFiles/embedding_labels_updated.npy')
-    print(labels_old)
+    labels_old = np.load('PythonFiles/ydata.npy')
+    # print(labels_old)
 
     labels_new = np.repeat(np.arange(dataset_size, dataset_size + new_user_labels), num_images_per_class_new)
-    print(labels_new)
+    # print(labels_new)
     y_train = np.concatenate((labels_old, labels_new))
-    print(y_train)
+    # print(y_train)
 
     embedding_vector = np.append(old_embedding_vector, new_user_embedding_vector, axis=0)
 
@@ -139,7 +147,7 @@ def TrainNewUsers():
 
     X_train,X_test,y_train,y_test=train_test_split(embedding_vector,y_train,test_size=0.1,shuffle=True, stratify=y_train,random_state=42)
 
-    X_train,y_train = shuffle(X_train,y_train)
+    # X_train,y_train = shuffle(X_train,y_train)
 
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
@@ -156,6 +164,8 @@ def TrainNewUsers():
     dump(pca, 'PythonFiles/pca_model_updated.joblib')
     dump(clf, 'PythonFiles/SVC_updated.joblib') 
 
+    print("Embedding vector;:",embedding_vector)
+    print("Y_train : ",y_train)
     newUserData = list(Train_Data.class_indices.keys())
     information_path = 'PythonFiles/information_set.csv'
     counter = dataset_size

@@ -70,6 +70,7 @@ def generateUser(label,placeholder):
         # cv2.imshow('Detected Faces', frame)
         frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
         placeholder.image(frame,caption = "Move your face to capture the face in all directions")
+        #script to increase the count of the images
 
         # Break the loop if the 'q' key is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):

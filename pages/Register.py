@@ -14,7 +14,7 @@ st.set_page_config(
     page_title="Register user"
 )
 
-Dataset_path = "PythonFiles/dataset.csv"
+Dataset_path = "PythonFiles/dataset_register.csv"
 def addUser(csv_file,data):
     with open(csv_file, 'a', newline='') as file:
         writer = csv.writer(file)

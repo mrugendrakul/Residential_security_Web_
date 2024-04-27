@@ -111,10 +111,10 @@ model.load_weights('PythonFiles/vgg_face_weights.h5')
 
 model = Model(inputs=model.layers[0].input, outputs=model.layers[-2].output)
 
-scaler = load('PythonFiles/scaler.joblib')
-pca = load('PythonFiles/pca_model.joblib')
+scaler = load('PythonFiles/scaler_updated.joblib')
+pca = load('PythonFiles/pca_model_updated.joblib')
 #Change this to load different classifier
-clf = load('PythonFiles/SVC.joblib')
+clf = load('PythonFiles/SVC_updated.joblib')
 
 def preprocess_image(img):
     img = img_to_array(img)
@@ -127,6 +127,7 @@ def Face_Recognition(roi,model,scaler,pca,clf):
     roi=preprocess_image(roi)
     embedding_vector = model.predict(roi)[0]
 
+    # print(len(embedding_vector))
     embedding_vector=scaler.transform(embedding_vector.reshape(1, -1))
     embedding_vector_pca = pca.transform(embedding_vector)
     result1 = clf.predict(embedding_vector_pca)[0]
@@ -134,7 +135,7 @@ def Face_Recognition(roi,model,scaler,pca,clf):
     y_predict = clf.predict_proba(embedding_vector_pca)[0]
     print(y_predict)
     
-    threshold = 0.8
+    threshold = 0.6
     result = np.where(y_predict > threshold)[0]
     
     return result , y_predict
@@ -151,8 +152,8 @@ for user,id in users.items():
     print(f"user : {user} id : {id}")
 print(f"{len(users)}")
 
-def ImageClass(n):
-    for x, y in users.items():
+def ImageClass(n,users_data):
+    for x, y in users_data.items():
         y = int(y)
         if n == y:
             return x
@@ -170,6 +171,14 @@ thickness = 2
 def LiveFaceRecognition(
         placeholder
 ):
+    
+    csv_file = "PythonFiles/dataset.csv"
+    users = classes(csv_file=csv_file)
+
+    for user,id in users.items():
+        print(f"user : {user} id : {id}")
+    print(f"{len(users)}")
+
     placeholder.write("![Loading GIF](https://media2.giphy.com/media/3oEjI6SIIHBdRxXI40/200w.gif?cid=6c09b952yx63atue9btnehyn9cu2z2g2o7xcmky4a8i7bjb0&ep=v1_gifs_search&rid=200w.gif&ct=gf)")
     unknown_folder = 'unknown_faces'
     os.makedirs(unknown_folder,exist_ok=True)
@@ -238,7 +247,7 @@ def LiveFaceRecognition(
                         # Recognize face
                         result, y_predict = Face_Recognition(roi, model, scaler, pca, clf)
                         if len(result) == 1:
-                            current_face = str(ImageClass(result[0]))
+                            current_face = str(ImageClass(result[0],users_data=users))
                             result_array.append(result[0])
                             cv2.putText(frame, current_face, (x1 - 5, y1 - 5), font, fontScale, color, thickness,
                                         cv2.LINE_AA)
@@ -316,7 +325,7 @@ def LiveFaceRecognition(
                 # print("--------------------")
 
                 for i,j in recognized_faces.items():
-                    current_face = str(ImageClass(int(i)))
+                    current_face = str(ImageClass(int(i),users_data=users))
                     
                     if recognized_faces[i] and i not in registered:
                         registered.append(i)
